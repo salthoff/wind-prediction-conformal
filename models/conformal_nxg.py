@@ -1,4 +1,4 @@
-"""Containing class for doing conformal prediction with weighted specialt conformity scores
+"""Containing class for doing conformal prediction with weighted special conformity scores
 
 """
 
@@ -15,7 +15,13 @@ class Conformal_nxg():
     
     def calibrate(self, data, forecast, label):
         if self.cs != None:
-            pass
+            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
+            input_vars = np.split(data, self.num_input_vars, axis = 1)
+            variance = np.empty((data.shape[0],self.num_input_vars))
+            for i in range(self.num_input_vars):
+                variance[:,i] = np.var(input_vars[i],axis=1)
+            self.cs = np.r_[self.cs,  (- variance @ self.input_factor.T + self.resid_factor*np.abs(label-forecast))]
+            
         else:
             self.weigths = np.power(self.ff, range(len(forecast),0,-1))
             input_vars = np.split(data, self.num_input_vars, axis = 1)
@@ -27,20 +33,14 @@ class Conformal_nxg():
         
         
         
-    def predict(self,inputdata,modeloutput, alpha, label = None):
+    def predict(self,data,forecast, confidence):
         weights_cal = self.weigths / (np.sum(self.weigths) + 1)
-        variance = np.var(np.split(inputdata,self.num_input_vars),axis=1)
-        if(np.sum(weights_cal) >= 1-alpha):
+        variance = np.var(np.split(data,self.num_input_vars),axis=1)
+        if(np.sum(weights_cal) >= confidence):
             ordR = np.argsort(self.cs)
-            ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=1-alpha))             
+            ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
             cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
         else:
             cal_thres = np.inf
-        
-        if label != None:
-            self.weigths = np.r_[self.ff**(len(self.weigths)+1) ,self.weigths]
-            
-            self.cs = np.r_[self.cs, self.resid_factor*np.abs(label-modeloutput)- variance @ self.input_factor.T]
-        
-        yPI = [modeloutput - cal_thres, modeloutput + cal_thres]
+        yPI = [forecast - cal_thres, forecast + cal_thres]
         return yPI

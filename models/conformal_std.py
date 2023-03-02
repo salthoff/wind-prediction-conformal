@@ -12,22 +12,28 @@ class Conformal_std():
         self.window_length = window_length
         self.residuals = None
         self.sigmas = None
-        self.system = None
+        self.system = ConformalRegressor
         self.input = None
 
 
 
-    def train(self,data, forecast, label):
+    def calibrate(self,data, forecast, label):
         if self.residuals != None:
             self.residuals = np.r_[self.residuals, (label -forecast)]
             self.sigmas = np.r_[self.sigmas, sigma_knn(X = data, residuals = (label -forecast))]
             self.input = np.r_[self.input, data]
         else:
-            self.residuals = label -forecast
+            self.residuals = label - forecast
             self.sigmas = sigma_knn(X=data, residuals=self.residuals)
             self.input = data
         
-        self.system = ConformalRegressor.fit(residuals=self.residuals, sigmas=self.sigmas)
+        if len(self.residuals) > self.window_length:
+            self.residuals=self.residuals[-self.window_length:]
+            self.sigmas = self.sigmas[-self.window_length:]
+            self.input = self.input[-self.window_length:,:]
+
+        self.system.fit(residuals=self.residuals, sigmas=self.sigmas)
+        
 
     def predict(self, data,forecast,confidence = 0.95):
         sigmas_test = sigma_knn(X = self.data, residuals=self.residuals, X_test = data)

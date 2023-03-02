@@ -10,13 +10,13 @@ class Conformal_nex():
         self.weigths = None
         self.residuals = None
     
-    def calibrate(self,data, modeloutput, label):
+    def calibrate(self,data, forecast, label):
         if self.weigths != None:
-            self.weigths = np.r_[np.power(self.ff, range(len(modeloutput)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
-            self.residuals = np.r_[self.residuals,np.abs(label-modeloutput)]
+            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
+            self.residuals = np.r_[self.residuals,np.abs(label-forecast)]
         else:
-            self.weigths = np.power(self.ff, range(len(modeloutput),0,-1))
-            self.residuals = np.abs(label-modeloutput)
+            self.weigths = np.power(self.ff, range(len(forecast),0,-1))
+            self.residuals = np.abs(label-forecast)
 
         
         
