@@ -17,10 +17,10 @@ class DataSplitter:
         dateranges =[]
         forecastdates = []
         for i in np.arange(1,len(splits)):
-            if splits[i-1].hour > time_of_day:
-                dateranges.append(pd.date_range(splits[i-1] + pd.Timedelta(hours=time_of_day + (24-splits[i-1].hour)) ,splits[i], freq = str(frequency)+'h'))
+            if splits[i-1].hour + 6 > time_of_day:
+                dateranges.append(pd.date_range(splits[i-1] + pd.Timedelta(hours=time_of_day + (24-(splits[i-1].hour))) ,splits[i], freq = str(frequency)+'h'))
             else:
-                dateranges.append(pd.date_range(splits[i-1] + pd.Timedelta(hours=time_of_day-splits[i-1].hour) ,splits[i], freq = str(frequency)+'h'))
+                dateranges.append(pd.date_range(splits[i-1] + pd.Timedelta(hours=np.max([6,time_of_day-splits[i-1].hour ])) ,splits[i], freq = str(frequency)+'h'))
             forecastdates.append(dateranges[-1] + pd.Timedelta(hours=time_horizon))
         
         measuredata = pd.read_csv(self.measuredirs[0], sep=';')
