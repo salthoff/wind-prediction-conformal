@@ -8,14 +8,13 @@ from quantile_forest import RandomForestQuantileRegressor as qrf
 class RanForestQuantile():
     def __init__(self, num_trees = 100, window_length = np.inf):
         self.window_length = window_length
-        self.system = None
         self.input = None
-        self.label = None
+        self.label = np.array([])
         self.system = qrf(n_estimators=num_trees)
 
     def calibrate(self, data, forecast, label):
         label = np.squeeze(label)
-        if self.label != None:
+        if self.label.size != 0:
             self.data = np.r_[self.data, data]
             self.label = np.r_[self.label, label]
         else:

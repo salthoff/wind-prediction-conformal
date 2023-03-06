@@ -7,16 +7,17 @@ import numpy as np
 class Conformal_nex():
     def __init__(self, forget_factor):
         self.ff = forget_factor
-        self.weigths = None
-        self.residuals = None
+        self.weigths = np.array([])
+        self.residuals = np.array([])
     
     def calibrate(self,data, forecast, label):
-        if self.weigths != None:
-            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
+        if self.weigths.size != 0:
+            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths)-1,len(self.weigths)-1,-1)), self.weigths]
             self.residuals = np.r_[self.residuals,np.abs(label-forecast)]
         else:
-            self.weigths = np.power(self.ff, range(len(forecast),0,-1))
+            self.weigths = np.power(self.ff, range(len(forecast)-1,-1,-1))
             self.residuals = np.abs(label-forecast)
+
 
         
         

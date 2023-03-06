@@ -10,15 +10,15 @@ from crepes.fillings import sigma_knn
 class Conformal_std():
     def __init__(self, window_length = np.inf):
         self.window_length = window_length
-        self.residuals = None
+        self.residuals = np.array([])
         self.sigmas = None
         self.system = ConformalRegressor()
-        self.input = None
+        self.input = np.array([])
 
 
 
     def calibrate(self, data, forecast, label):
-        if self.residuals != None:
+        if self.residuals.size != 0:
             self.residuals = np.r_[self.residuals, (label -forecast)]
             #self.sigmas = np.r_[self.sigmas, sigma_knn(X = data, residuals = (label -forecast))]
             self.input = np.r_[self.input, data]
