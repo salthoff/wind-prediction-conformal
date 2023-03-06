@@ -12,16 +12,17 @@ class Conformal_std():
         self.window_length = window_length
         self.residuals = None
         self.sigmas = None
-        self.system = ConformalRegressor
+        self.system = ConformalRegressor()
         self.input = None
 
 
 
-    def calibrate(self,data, forecast, label):
+    def calibrate(self, data, forecast, label):
         if self.residuals != None:
             self.residuals = np.r_[self.residuals, (label -forecast)]
-            self.sigmas = np.r_[self.sigmas, sigma_knn(X = data, residuals = (label -forecast))]
+            #self.sigmas = np.r_[self.sigmas, sigma_knn(X = data, residuals = (label -forecast))]
             self.input = np.r_[self.input, data]
+            self.sigmas = sigma_knn(X = self.input, residuals=self.residuals)
         else:
             self.residuals = label - forecast
             self.sigmas = sigma_knn(X=data, residuals=self.residuals)
@@ -32,11 +33,11 @@ class Conformal_std():
             self.sigmas = self.sigmas[-self.window_length:]
             self.input = self.input[-self.window_length:,:]
 
-        self.system.fit(residuals=self.residuals, sigmas=self.sigmas)
+        self.system.fit(residuals=np.squeeze(self.residuals), sigmas=self.sigmas)
         
 
     def predict(self, data,forecast,confidence = 0.95):
-        sigmas_test = sigma_knn(X = self.data, residuals=self.residuals, X_test = data)
-        pred = self.system.predict(y_hat = forecast, sigmas = self.sigmas, confidence = confidence)
+        sigmas_test = sigma_knn(X = self.input, residuals=self.residuals, X_test = data.reshape(1, -1))
+        pred = self.system.predict(y_hat = forecast, sigmas = sigmas_test, confidence = confidence)
 
         return pred

@@ -21,15 +21,14 @@ class Conformal_nex():
         
         
         
-    def predict(self,data, modeloutput, confidence =0.95):
+    def predict(self,data, modeloutput, confidence = 0.95):
         weights_cal = self.weigths / (np.sum(self.weigths) + 1)
-      
-        if(np.sum(weights_cal) >= confidence):
-            ordR = np.argsort(self.res)
-            ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
-            cal_thres = np.sort(self.res)[ind_thres]
+        if (np.sum(weights_cal) >= confidence):
+            ordR = np.argsort(np.squeeze(self.residuals))
+            ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))         
+            cal_thres = np.sort(np.squeeze(self.residuals))[ind_thres]
         else:
             cal_thres = np.inf
         
-        yPI = [modeloutput - cal_thres, modeloutput + cal_thres]
+        yPI = np.squeeze([modeloutput - cal_thres, modeloutput + cal_thres])
         return yPI

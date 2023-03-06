@@ -14,6 +14,8 @@ class Conformal_nxg():
         self.weigths = None
     
     def calibrate(self, data, forecast, label):
+        forecast = np.squeeze(forecast)
+        label = np.squeeze(label)
         if self.cs != None:
             self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
             input_vars = np.split(data, self.num_input_vars, axis = 1)
@@ -28,12 +30,13 @@ class Conformal_nxg():
             variance = np.empty((data.shape[0],self.num_input_vars))
             for i in range(self.num_input_vars):
                 variance[:,i] = np.var(input_vars[i],axis=1)
-        
+            
             self.cs = - variance @ self.input_factor.T + self.resid_factor*np.abs(label-forecast)
+            
         
         
         
-    def predict(self,data,forecast, confidence):
+    def predict(self,data,forecast, confidence = 0.95):
         weights_cal = self.weigths / (np.sum(self.weigths) + 1)
         variance = np.var(np.split(data,self.num_input_vars),axis=1)
         if(np.sum(weights_cal) >= confidence):
@@ -42,5 +45,5 @@ class Conformal_nxg():
             cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
         else:
             cal_thres = np.inf
-        yPI = [forecast - cal_thres, forecast + cal_thres]
+        yPI = np.squeeze([forecast - cal_thres, forecast + cal_thres])
         return yPI
