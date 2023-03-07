@@ -14,10 +14,15 @@ class Conformal_nxg():
         self.weigths = np.array([])
     
     def calibrate(self, data, forecast, label):
-        forecast = np.squeeze(forecast)
-        label = np.squeeze(label)
+        if len(forecast) > 1:
+            forecast = np.squeeze(forecast)
+            label = np.squeeze(label)
+        else:
+            forecast = forecast.flatten()
+            label = label.flatten()
+
         if self.cs.size != 0:
-            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths),len(self.weigths)+1,-1)), self.weigths]
+            self.weigths = np.r_[np.power(self.ff, range(len(forecast)+len(self.weigths)-1,len(self.weigths)-1,-1)), self.weigths]
             input_vars = np.split(data, self.num_input_vars, axis = 1)
             variance = np.empty((data.shape[0],self.num_input_vars))
             for i in range(self.num_input_vars):
@@ -25,7 +30,7 @@ class Conformal_nxg():
             self.cs = np.r_[self.cs,  (- variance @ self.input_factor.T + self.resid_factor*np.abs(label-forecast))]
             
         else:
-            self.weigths = np.power(self.ff, range(len(forecast),0,-1))
+            self.weigths = np.power(self.ff, range(len(forecast)-1,-1,-1))
             input_vars = np.split(data, self.num_input_vars, axis = 1)
             variance = np.empty((data.shape[0],self.num_input_vars))
             for i in range(self.num_input_vars):

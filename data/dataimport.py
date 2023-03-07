@@ -11,7 +11,7 @@ def dataimport():
 
     datsplitter = DataSplitter(inputdirs,forecastdirs,measurementdir)
 
-    splits= [pd.to_datetime('2022-09-15'), pd.to_datetime('2022-11-15 18:00:00'), pd.to_datetime('2023-01-23 18:00:00')]
+    splits= [pd.to_datetime('2022-09-15'), pd.to_datetime('2022-11-10 18:00:00'), pd.to_datetime('2023-01-23 18:00:00')]
     inputvars = ['x_wind_10m','y_wind_10m']
     ens_num = 30
     data, fcdata, msdata, fcdates = datsplitter.data_split(splits,inputvars,['wind_speed_10m'],['Vindhastighet'],24, ensemble_number=ens_num)

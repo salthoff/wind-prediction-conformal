@@ -39,5 +39,5 @@ class Conformal_std():
     def predict(self, data,forecast,confidence = 0.95):
         sigmas_test = sigma_knn(X = self.input, residuals=self.residuals, X_test = data.reshape(1, -1))
         pred = self.system.predict(y_hat = forecast, sigmas = sigmas_test, confidence = confidence)
-
-        return pred
+        #print(pred)
+        return np.squeeze(pred)

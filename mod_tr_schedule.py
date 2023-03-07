@@ -1,7 +1,7 @@
 import numpy as np
 
 def scoring(predictions, label, confidence):
-    print(predictions)
+    #print(predictions)
     accuracy = np.sum((np.squeeze(label) > predictions[:,0]) & (np.squeeze(label) < predictions[:,1]))/len(label)
     width = np.mean(predictions[:,1]-predictions[:,0])
     return 1000 * np.abs(confidence-accuracy) + width
@@ -11,7 +11,6 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
     score = np.empty(len(model_params))
 
     for i in range(len(model_params)):
-        #predictions = np.array()
         first = True
         labels = np.array([])
         for s in range(num_splits):
@@ -21,7 +20,7 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
             model.calibrate(input[:j],forecast[:j],measurement[:j])
             while j < len(measurement):
                 if s > 0:
-                    model.calibrate(input[j:np.min([j+s,len(measurement)])], forecast[j:np.min([j+s,len(measurement)])], measurement[j:np.min([j+s,len(measurement)])])
+                    model.calibrate(input[j:np.min([j+s,len(measurement)])], np.array(forecast[j:np.min([j+s,len(measurement)])]), measurement[j:np.min([j+s,len(measurement)])])
                 if j+s < len(measurement):
                     pred = model.predict(input[j+s], forecast[j+s], confidence = confidence)
                     if first:
@@ -48,6 +47,7 @@ def train_schedule(model_class, model_parameters, baseinput, basefc, basems, tes
     trainfc = basefc
     trainms = basems
     for i in range(len(testms)):
+        #print(str(i) + " of " + str(len(testms)))
         best_model = model_runs(model_class, model_parameters, traininput, trainfc, trainms, num_splits, confidence)
         model = model_class(**best_model)
         model.calibrate(traininput,trainfc,trainms)
