@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 def scoring(predictions, label, confidence):
     #print(predictions)
@@ -22,7 +23,7 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
                 if s > 0:
                     model.calibrate(input[j:np.min([j+s,len(measurement)])], np.array(forecast[j:np.min([j+s,len(measurement)])]), measurement[j:np.min([j+s,len(measurement)])])
                 if j+s < len(measurement):
-                    pred = model.predict(input[j+s], forecast[j+s], confidence = confidence)
+                    pred = model.predict(input[j+s], np.array(forecast[j+s]), confidence = confidence)
                     if first:
                         predictions = np.array([pred])
                         first = False
@@ -46,8 +47,7 @@ def train_schedule(model_class, model_parameters, baseinput, basefc, basems, tes
     traininput = baseinput
     trainfc = basefc
     trainms = basems
-    for i in range(len(testms)):
-        #print(str(i) + " of " + str(len(testms)))
+    for i in tqdm(range(len(testms))):
         best_model = model_runs(model_class, model_parameters, traininput, trainfc, trainms, num_splits, confidence)
         model = model_class(**best_model)
         model.calibrate(traininput,trainfc,trainms)
