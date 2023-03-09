@@ -8,9 +8,36 @@ def scoring(predictions, label, confidence):
     return 1000 * np.abs(confidence-accuracy) + width
 
 
-def model_runs(model_class, model_params, input, forecast, measurement, num_splits, confidence):
+def model_runs(model_class, model_params, input, forecast, measurement, num_splits, confidence, block_training = False):
     score = np.empty(len(model_params))
-
+    if block_training:
+        block_len = len(forecast) // num_splits
+        rest = len(forecast) % num_splits
+        for i in range(len(model_params)):
+            first = True
+            labels = np.array([])
+            for j in range(num_splits):
+                block_input = np.r_[input[rest+(j+1)*block_len:] ,input[:j*block_len+rest]]
+                block_fc = np.r_[forecast[rest+(j+1)*block_len:] ,forecast[:j*block_len+rest]]
+                block_ms = np.r_[measurement[rest+(j+1)*block_len:] ,measurement[:j*block_len+rest]]
+                model = model_class(**model_params[i])
+                model.calibrate(block_input, block_fc, block_ms)
+                test_input = input[j*block_len+rest:rest+(j+1)*block_len]
+                test_fc = forecast[j*block_len+rest:rest+(j+1)*block_len]
+                test_ms = measurement[j*block_len+rest:rest+(j+1)*block_len]
+                for t in range(block_len):
+                    pred = model.predict(test_input[t],test_fc[t],confidence = confidence)
+                    if first:
+                        predictions = np.array([pred])
+                        first = False
+                    else:
+                        predictions = np.r_[predictions, np.array([pred])]
+                    
+                    labels = np.r_[labels, test_ms[t]]
+            score[i]=scoring(predictions, labels, confidence)
+        best_model = model_params[np.argmin(score)]
+        return best_model
+            
     for i in range(len(model_params)):
         first = True
         labels = np.array([])
@@ -41,14 +68,14 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
     return best_model
 
 
-def train_schedule(model_class, model_parameters, baseinput, basefc, basems, testinput, testfc, testms, num_splits = 5, confidence = 0.9):
+def train_schedule(model_class, model_parameters, baseinput, basefc, basems, testinput, testfc, testms, num_splits = 5, confidence = 0.9, block_training = False):
     predictions = np.empty((len(testms),2))
     models = []
     traininput = baseinput
     trainfc = basefc
     trainms = basems
     for i in tqdm(range(len(testms))):
-        best_model = model_runs(model_class, model_parameters, traininput, trainfc, trainms, num_splits, confidence)
+        best_model = model_runs(model_class, model_parameters, traininput, trainfc, trainms, num_splits, confidence, block_training=block_training)
         model = model_class(**best_model)
         model.calibrate(traininput,trainfc,trainms)
         models.append(best_model)
