@@ -5,13 +5,13 @@ import numpy as np
 from data.datasplitter import DataSplitter
 
 def dataimport():
-    inputdirs = ['./data/junensemble.nc','./data/julensemble.nc','./data/augensemble.nc','./data/sepensemble.nc','./data/oktensemble.nc', './data/novensemble.nc', './data/decensemble.nc', './data/janensemble.nc']
-    forecastdirs = ['./data/junforecast.nc','./data/julforecast.nc','./data/augforecast.nc','./data/sepforecast.nc','./data/oktforecast.nc', './data/novforecast.nc', './data/decforecast.nc', './data/janforecast.nc']
+    inputdirs = ['./data/jan22ensemble.nc','./data/febensemble.nc','./data/marensemble.nc','./data/aprensemble.nc','./data/mayensemble.nc','./data/junensemble.nc','./data/julensemble.nc','./data/augensemble.nc','./data/sepensemble.nc','./data/oktensemble.nc', './data/novensemble.nc', './data/decensemble.nc', './data/janensemble.nc']
+    forecastdirs = ['./data/jan22forecast.nc','./data/febforecast.nc','./data/marforecast.nc','./data/aprforecast.nc','./data/mayforecast.nc','./data/junforecast.nc','./data/julforecast.nc','./data/augforecast.nc','./data/sepforecast.nc','./data/oktforecast.nc', './data/novforecast.nc', './data/decforecast.nc', './data/janforecast.nc']
     measurementdir = ['./data/matdata.csv']
 
     datsplitter = DataSplitter(inputdirs,forecastdirs,measurementdir)
 
-    splits= [pd.to_datetime('2022-06-01'), pd.to_datetime('2022-08-01'), pd.to_datetime('2023-01-23 18:00:00')]
+    splits= [pd.to_datetime('2022-01-01'), pd.to_datetime('2022-03-01'), pd.to_datetime('2023-01-23 18:00:00')]
     inputvars = ['x_wind_10m','y_wind_10m']
     ens_num = 30
     data, fcdata, msdata, fcdates = datsplitter.data_split(splits,inputvars,['wind_speed_10m'],['Vindhastighet'],24, ensemble_number=ens_num)
