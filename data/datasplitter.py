@@ -4,6 +4,7 @@ import scipy as sc
 import numpy as np
 
 
+
 class DataSplitter:
     def __init__(self,inputdirs, forecastdirs, measuredirs):
         self.inputdirs = inputdirs
