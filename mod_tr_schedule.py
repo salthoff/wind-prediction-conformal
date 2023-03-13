@@ -5,7 +5,7 @@ def scoring(predictions, label, confidence):
     #print(predictions)
     accuracy = np.sum((np.squeeze(label) > predictions[:,0]) & (np.squeeze(label) < predictions[:,1]))/len(label)
     width = np.mean(predictions[:,1]-predictions[:,0])
-    return 1000 * np.abs(confidence-accuracy) + width
+    return 2000 * np.abs(confidence-accuracy) + width
 
 
 def model_runs(model_class, model_params, input, forecast, measurement, num_splits, confidence, block_training = False):
