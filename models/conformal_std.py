@@ -20,18 +20,19 @@ class Conformal_std():
     def calibrate(self, data, forecast, label):
         if self.residuals.size != 0:
             self.residuals = np.r_[self.residuals, (label -forecast)]
-            #self.sigmas = np.r_[self.sigmas, sigma_knn(X = data, residuals = (label -forecast))]
             self.input = np.r_[self.input, data]
-            self.sigmas = sigma_knn(X = self.input, residuals=self.residuals)
+            #self.sigmas = sigma_knn(X = self.input, residuals=self.residuals)
         else:
             self.residuals = label - forecast
-            self.sigmas = sigma_knn(X=data, residuals=self.residuals)
+            #self.sigmas = sigma_knn(X=data, residuals=self.residuals)
             self.input = data
         
         if len(self.residuals) > self.window_length:
             self.residuals=self.residuals[-self.window_length:]
-            self.sigmas = self.sigmas[-self.window_length:]
+            #self.sigmas = self.sigmas[-self.window_length:]
             self.input = self.input[-self.window_length:,:]
+        
+        self.sigmas = sigma_knn(X = self.input, residuals=self.residuals)
 
         self.system.fit(residuals=np.squeeze(self.residuals), sigmas=self.sigmas)
         
