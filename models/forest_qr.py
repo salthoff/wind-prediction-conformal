@@ -26,7 +26,13 @@ class RanForestQuantile():
         else:
             self.system.fit(X=self.data, y=self.label)
 
-    def predict(self, data, forecast, confidence = 0.95):
-        pred = self.system.predict(X = data.reshape(1, -1), quantiles = [np.linspace(0,1,num=100)])
+    def predict(self, data, forecast, length_distr = 200, ymin = 0, ymax = 100):
+        pred = np.squeeze(self.system.predict(X = data.reshape(1, -1), quantiles = np.linspace(1/length_distr, 1-1/length_distr, num=length_distr-2).tolist()))
+        if pred[0]< ymin:
+            pred = pred[pred > ymin]
+            pred = np.r_[ymin, pred, ymax]
+            pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
+        else:
+            pred = np.r_[ymin, pred, ymax]
         return np.squeeze(pred)
 

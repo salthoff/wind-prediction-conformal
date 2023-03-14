@@ -7,6 +7,18 @@ def scoring(predictions, label, confidence):
     width = np.mean(predictions[:,1]-predictions[:,0])
     return 2000 * np.abs(confidence-accuracy) + width
 
+def crps(predictions, label):
+    scores = np.empty(len(label))
+    length = predictions.shape[1]
+    for i in range(len(label)):
+        low = predictions[i,:][predictions[i,:]<=label[i]]
+        up = predictions[i,:][predictions[i,:]>=label[i]]
+        f_low = np.cumsum((1/length)*np.ones(len(low)))
+        f_up = np.cumsum((1/length)*np.ones(len(up))) + f_low[-1]
+
+    print(f_low)
+    print(f_up)
+
 
 def model_runs(model_class, model_params, input, forecast, measurement, num_splits, confidence, block_training = False):
     score = np.empty(len(model_params))

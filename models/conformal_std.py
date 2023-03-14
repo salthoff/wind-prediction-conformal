@@ -35,7 +35,14 @@ class Conformal_std():
         self.system.fit(residuals=np.squeeze(self.residuals), sigmas=self.sigmas)
         
 
-    def predict(self, data,forecast,confidence = 0.95):
+    def predict(self, data, forecast, length_distr = 200, ymin = 0, ymax = 100):
         sigmas_test = sigma_knn(X = self.input, residuals=self.residuals, X_test = data.reshape(1, -1))
-        pred = self.system.predict(y_hat = forecast, sigmas = sigmas_test, return_cpds=True)
+        pred = np.squeeze(self.system.predict(y_hat = forecast, sigmas = sigmas_test, return_cpds=True))
+        if pred[0]< ymin:
+            pred = pred[pred > ymin]
+            pred = np.r_[ymin, pred, ymax]
+            pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
+        else:
+            pred = np.r_[ymin, pred, ymax]
+            pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         return np.squeeze(pred)

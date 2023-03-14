@@ -41,14 +41,29 @@ class Conformal_nxg():
         
         
         
-    def predict(self,data,forecast, confidence = 0.95):
+    def predict(self,data,forecast, length_distr = 200, ymin = 0, ymax = 100):
         weights_cal = self.weigths / (np.sum(self.weigths) + 1)
         variance = np.var(np.split(data,self.num_input_vars),axis=1)
-        if(np.sum(weights_cal) >= confidence):
-            ordR = np.argsort(self.cs)
-            ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
-            cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
+        num_i = np.min([len(weights_cal)//2,length_distr//2])
+        pred = forecast
+        for i in range(num_i - 1):
+            confidence = (i+1)/num_i
+            if(np.sum(weights_cal) >= confidence):
+                ordR = np.argsort(self.cs)
+                ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
+                cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
+            else:
+                cal_thres = np.inf
+            pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
+        
+        
+        if pred[0]< ymin:
+            pred = pred[pred > ymin]
+            pred = np.r_[ymin, pred, ymax]
+            pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         else:
-            cal_thres = np.inf
-        yPI = np.squeeze([forecast - cal_thres, forecast + cal_thres])
-        return yPI
+            pred = np.r_[ymin, pred, ymax]
+            if len(pred) != length_distr:
+                pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
+        
+        return np.squeeze(pred)
