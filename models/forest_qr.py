@@ -27,6 +27,6 @@ class RanForestQuantile():
             self.system.fit(X=self.data, y=self.label)
 
     def predict(self, data, forecast, confidence = 0.95):
-        pred = self.system.predict(X = data.reshape(1, -1), quantiles = [(1-confidence)/2, 1-(1-confidence)/2])
+        pred = self.system.predict(X = data.reshape(1, -1), quantiles = [np.linspace(0,1,num=100)])
         return np.squeeze(pred)
 
