@@ -28,19 +28,20 @@ class Conformal_nex():
         pred = forecast
         for i in range(num_i - 1):
             confidence = (i+1)/num_i
-
             if (np.sum(weights_cal) >= confidence):
                 ordR = np.argsort(np.squeeze(self.residuals))
                 ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))         
                 cal_thres = np.sort(np.squeeze(self.residuals))[ind_thres]
             else:
-                cal_thres = np.inf
+                cal_thres = ymax
         
             pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
         
         if pred[0]< ymin:
-            pred = pred[pred > ymin]
-            pred = np.r_[ymin, pred, ymax]
+            #pred = pred[pred > ymin]
+            pred[pred < ymin] = ymin
+            #pred = np.r_[ymin, pred, ymax]
+            pred = np.r_[pred, ymax]
             pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         else:
             pred = np.r_[ymin, pred, ymax]

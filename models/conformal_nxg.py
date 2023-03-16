@@ -53,13 +53,17 @@ class Conformal_nxg():
                 ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
                 cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
             else:
-                cal_thres = np.inf
+                cal_thres = ymax
             pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
         
         
         if pred[0]< ymin:
-            pred = pred[pred > ymin]
-            pred = np.r_[ymin, pred, ymax]
+            #pred = pred[pred > ymin]
+            pred[pred < ymin] = ymin
+            #pred = np.r_[ymin, pred, ymax]
+            pred = np.r_[pred, ymax]
+
+        
             pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         else:
             pred = np.r_[ymin, pred, ymax]
