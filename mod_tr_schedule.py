@@ -15,7 +15,10 @@ def crps(predictions, label):
         low = predictions[i,:][predictions[i,:]<=label[i]]
         up = predictions[i,:][predictions[i,:]>=label[i]]
         f_low = np.cumsum((1/length)*np.ones(len(low)))
-        f_up = np.cumsum((1/length)*np.ones(len(up))) + f_low[-1]
+        if f_low.size > 0:
+            f_up = np.cumsum((1/length)*np.ones(len(up))) + f_low[-1]
+        else:
+            f_up = np.cumsum((1/length)*np.ones(len(up)))
         low_score = np.sum((np.power(f_low[:-1],2)+np.power(f_low[1:],2))*(low[1:]-low[:-1]))/2
         up_score = np.sum((np.power((f_up[:-1]-1),2)+np.power((f_up[1:]-1),2))*(up[1:]-up[:-1]))/2
         scores[i] = low_score + up_score

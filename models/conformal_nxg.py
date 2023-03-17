@@ -28,7 +28,6 @@ class Conformal_nxg():
             for i in range(self.num_input_vars):
                 variance[:,i] = np.var(input_vars[i],axis=1)
             self.cs = np.r_[self.cs,  (- variance @ self.input_factor.T + self.resid_factor*np.abs(label-forecast))]
-            
         else:
             self.weigths = np.power(self.ff, range(len(forecast)-1,-1,-1))
             input_vars = np.split(data, self.num_input_vars, axis = 1)
@@ -52,18 +51,15 @@ class Conformal_nxg():
                 ordR = np.argsort(self.cs)
                 ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
                 cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
+                if cal_thres < 0:
+                    raise Exception('Resulting conformity is negative, input_factor ' + str(self.input_factor) + ' is probabily too large.')
+                pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
             else:
-                cal_thres = ymax
-            pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
-        
-        
+                pred = np.r_[ymin,pred, ymax]
+            
         if pred[0]< ymin:
-            #pred = pred[pred > ymin]
             pred[pred < ymin] = ymin
-            #pred = np.r_[ymin, pred, ymax]
             pred = np.r_[pred, ymax]
-
-        
             pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         else:
             pred = np.r_[ymin, pred, ymax]
