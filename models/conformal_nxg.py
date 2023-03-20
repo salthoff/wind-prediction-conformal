@@ -52,7 +52,7 @@ class Conformal_nxg():
                 ind_thres = np.min(np.where(np.cumsum(weights_cal[ordR])>=confidence))             
                 cal_thres = (np.sort(self.cs)[ind_thres] + variance @ self.input_factor.T)/self.resid_factor
                 if cal_thres < 0:
-                    raise Exception('Resulting conformity is negative, input_factor ' + str(self.input_factor) + ' is probabily too large.')
+                    raise Exception('Resulting conformity is negative, input_factor ' + str(self.input_factor) + ' is probabily too big.')
                 pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
             else:
                 pred = np.r_[ymin,pred, ymax]

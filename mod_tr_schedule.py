@@ -53,7 +53,6 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
                         predictions = np.r_[predictions, np.array([pred])]
                     
                     labels = np.r_[labels, test_ms[t]]
-            #score[i]=scoring(predictions, labels, confidence)
             score[i]=crps(predictions, labels)
         best_model = model_params[np.argmin(score)]
         return best_model
@@ -83,7 +82,6 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
                         model.calibrate(input[j+s+1:j+num_splits], forecast[j+s+1:j+num_splits], measurement[j+s+1:j+num_splits])
                 
                 j += num_splits
-        #score[i] = scoring(predictions, labels, confidence)
         score[i]=crps(predictions, labels)
     
     best_model = model_params[np.argmin(score)]

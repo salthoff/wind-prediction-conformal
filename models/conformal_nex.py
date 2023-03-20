@@ -35,9 +35,9 @@ class Conformal_nex():
                 pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
             else:
                 pred = np.r_[ymin,pred, ymax]
-                #cal_thres = ymax
+                
         
-            #pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
+            
         
         if pred[0]< ymin:
             #pred = pred[pred > ymin]

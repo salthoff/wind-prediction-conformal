@@ -12,10 +12,8 @@ def dataimport(inputvars = ['x_wind_10m','y_wind_10m']):
     datsplitter = DataSplitter(inputdirs,forecastdirs,measurementdir)
 
     splits= [pd.to_datetime('2022-01-01'), pd.to_datetime('2022-03-01'), pd.to_datetime('2023-01-23 18:00:00')]
-    #inputvars = ['x_wind_10m','y_wind_10m']
     ens_num = 30
     data, fcdata, msdata, fcdates = datsplitter.data_split(splits,inputvars,['wind_speed_10m'],['Vindhastighet'],24, ensemble_number=ens_num)
-
 
     for s in range(len(splits)-1):
         delS = np.array([],dtype=int)
@@ -33,13 +31,10 @@ def dataimport(inputvars = ['x_wind_10m','y_wind_10m']):
             elif np.sum(np.isnan(data[s][p,:])) > 0:
                 for i in range(len(inputvars)):
                     data[s][p,i*ens_num:(i+1)*ens_num][np.argwhere(np.isnan(data[s][p,i*ens_num:(i+1)*ens_num]))] = np.random.choice(data[s][p,i*ens_num:(i+1)*ens_num][np.argwhere(~np.isnan(data[s][p,i*ens_num:(i+1)*ens_num]))].flatten(),(len(np.argwhere(np.isnan(data[s][p,i*ens_num:(i+1)*ens_num]))),1))
-                #data[s][p,np.argwhere(np.isnan(data[s][p,:]))] = np.random.choice(data[s][p,~np.isnan(data[s][p,:])],(len(data[s][p,np.argwhere(np.isnan(data[s][p,:]))]),1))
 
     
         data[s] = np.delete(data[s], delS, axis=0)
         fcdata[s] = np.delete(fcdata[s], delS, axis=0)
         msdata[s] = np.delete(msdata[s], delS, axis=0)
         fcdates[s] = np.delete(fcdates[s], delS, axis=0)
-        #fcdata[s] = np.squeeze(fcdata[s])
-        #msdata[s] = np.squeeze(msdata[s])
     return data, fcdata, msdata, fcdates
