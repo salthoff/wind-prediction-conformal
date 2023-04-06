@@ -5,6 +5,26 @@
 import numpy as np
 
 class Conformal_nex():
+    """
+    Class for using the non-exchangeable conformal predictor
+
+    Attributes
+    ---------
+    ff: float
+        Forgetting factor
+    weights:
+        weights associated with each example
+    residuals:
+        saved residuals from point predictions
+    
+    Methods
+    -------
+    calibrate(data, forecast, label)
+        Calibrates the system
+    predict(data, forecast, length_distr = 200, ymin = 0, ymax = 100)
+        Predicts the CDF from data and forecast
+    """
+
     def __init__(self, forget_factor):
         self.ff = forget_factor
         self.weigths = np.array([])
@@ -35,14 +55,9 @@ class Conformal_nex():
                 pred = np.r_[forecast - cal_thres,pred, forecast + cal_thres]
             else:
                 pred = np.r_[ymin,pred, ymax]
-                
-        
-            
-        
+
         if pred[0]< ymin:
-            #pred = pred[pred > ymin]
             pred[pred < ymin] = ymin
-            #pred = np.r_[ymin, pred, ymax]
             pred = np.r_[pred, ymax]
             pred = np.interp(np.linspace(0,1,num=length_distr),np.linspace(0,1,num=len(pred)),pred)
         else:

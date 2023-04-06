@@ -9,6 +9,32 @@ from crepes.fillings import sigma_knn
 
 
 class Conformal_std():
+    """
+    A class for using the normalized CPDS
+
+    Attributes
+    ----------
+    window_length: int
+        Length of data to be used by the system
+    diff_estimate: int, optional
+        Number of nearest neighbours to be used in difficulty estimates
+    residuals:
+        saved residuals of the point predicitons
+    sigmas:
+        difficulty estimates of the examples
+    system:
+        the CPDS system
+    input:
+        saved input data
+
+    Methods
+    -------
+    calibrate(data, forecast, label)
+        Calibrates the system according to the passed data
+    predict(data, forecast, length_distr = 200, ymin = 0, ymax = 100)
+        Predicts the CDF from data and forecast
+    """
+
     def __init__(self, window_length = np.inf, diff_estimate = 5):
         self.window_length = window_length
         self.residuals = np.array([])

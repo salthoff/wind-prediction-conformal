@@ -5,6 +5,31 @@
 import numpy as np
 
 class Conformal_nxg():
+    """
+    Class for using the non-exchangeable conformal predictor with custom conformity
+
+    Attributes
+    ---------
+    ff: float
+        Forgetting factor
+    resid_factor: float
+        Multiplicative factor for residuals in conformity score
+    input_factor: numpy array of float
+        Factor for variance of input data in conformity score
+    num_input_vars: int
+        Number of variables in the ensemble input
+    cs:
+        Conformity scores of data
+    weights:
+        weights associated with each example
+    
+    Methods
+    -------
+    calibrate(data, forecast, label)
+        Calibrates the system
+    predict(data, forecast, length_distr = 200, ymin = 0, ymax = 100)
+        Predicts the CDF from data and forecast
+    """
     def __init__(self, forget_factor, resid_factor, input_factor, num_input_vars):
         self.ff = forget_factor
         self.resid_factor = resid_factor
