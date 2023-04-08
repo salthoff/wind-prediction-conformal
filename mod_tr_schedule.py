@@ -56,32 +56,25 @@ def model_runs(model_class, model_params, input, forecast, measurement, num_spli
             score[i]=crps(predictions, labels)
         best_model = model_params[np.argmin(score)]
         return best_model
-            
+
     for i in range(len(model_params)):
         first = True
         labels = np.array([])
-        for s in range(num_splits):
-            j = 0
-            model = model_class(**model_params[i])
-            rest = len(forecast) % num_splits
-            j = rest + 1
-            model.calibrate(input[:j],forecast[:j],measurement[:j])
-            while j < len(measurement):
-                if s > 0:
-                    model.calibrate(input[j:np.min([j+s,len(measurement)])], np.array(forecast[j:np.min([j+s,len(measurement)])]), measurement[j:np.min([j+s,len(measurement)])])
-                if j+s < len(measurement):
-                    pred = model.predict(input[j+s], np.array(forecast[j+s]), length_distr = len_distr)
-                    if first:
-                        predictions = np.array([pred])
-                        first = False
-                    else:
-                        predictions = np.r_[predictions, np.array([pred])]
-                    labels = np.r_[labels, measurement[j+s]]
-                    
-                    if j + num_splits < len(measurement):
-                        model.calibrate(input[j+s+1:j+num_splits], forecast[j+s+1:j+num_splits], measurement[j+s+1:j+num_splits])
-                
-                j += num_splits
+        
+        model = model_class(**model_params[i])
+        rest = len(forecast) % num_splits
+        j = rest + 1
+        model.calibrate(input[:j],forecast[:j],measurement[:j])
+        while j < len(measurement):
+            pred = model.predict(input[j], np.array(forecast[j]), length_distr = len_distr)
+            model.calibrate(input[j:j+1],forecast[j:j+1],measurement[j:j+1])
+            if first:
+                predictions = np.array([pred])
+                first = False
+            else:
+                predictions = np.r_[predictions, np.array([pred])]
+            labels = np.r_[labels, measurement[j]]
+            j += 1
         score[i]=crps(predictions, labels)
     
     best_model = model_params[np.argmin(score)]
