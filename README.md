@@ -1,6 +1,6 @@
 ## Wind prediction using conformal
 
-All data in the data directory are gathered under the Creative Commons 4.0 BY license. Ensemble and forecast data are provided by MET Norway while the measurements in ´matdata.csv´ are provided by SMHI.
+All data in the data directory are gathered under the [Creative Commons 4.0 BY](https://creativecommons.org/licenses/by/4.0/) license. Ensemble and forecast data are provided by MET Norway while the measurements in ´matdata.csv´ are provided by SMHI.
 
 Certain attributes and columns have been removed from the SMHI data, the measurements have not been altered with.
 
